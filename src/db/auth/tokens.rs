@@ -1,5 +1,5 @@
 // for people who do not understand the upcoming code, THIS DOES NOT STORE TOKENS. it certainly only stores some token details which are required to invalidate a token
-use anyhow::Ok;
+
 use chrono::DateTime;
 use chrono::Utc;
 use serde::Deserialize;
@@ -83,12 +83,26 @@ impl Database {
 
         let mut txn = self.pool.begin().await?;
 
-        sqlx::query("DELETE FROM auth_tokens WHERE uid = $1")
+        let result = sqlx::query("DELETE FROM auth_tokens WHERE uid = $1")
             .bind(user_id)
             .execute(&mut *txn)
-            .await?;
+            .await;
 
-        Ok(())
+        match result {
+            Ok(_) => {
+                txn.commit().await?;
+                println!("Deleted all rows with uid = {}", user_id);
+                Ok(())
+            }
+            Err(e) => {
+                    // Rollback the transaction in case of an error
+                txn.rollback().await?;
+                println!("Failed to delete rows with uid = {}: {}", user_id, e);
+                Err(e.into())
+            }
+        }
+
+
     }
 }
 
