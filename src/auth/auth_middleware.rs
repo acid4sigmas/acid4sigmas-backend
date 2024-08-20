@@ -27,7 +27,6 @@ where
 
         match token_handler.verify_token(auth_header).await {
             Ok(claims) => {
-                println!("claims: {:?}", claims);
                 let uid: i64 = match claims.user_id.parse() {
                     Ok(uid) => uid,
                     Err(e) => {
