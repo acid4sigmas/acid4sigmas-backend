@@ -7,7 +7,7 @@ use actix_web::{
 use actix_web_lab::middleware::Next;
 use serde_json::json;
 
-use crate::db::auth::auth::Database;
+use crate::{cache::init_caches::USER_CACHE, db::auth::auth::Database};
 
 use super::utils::TokenHandler;
 
@@ -27,26 +27,7 @@ where
 
         match token_handler.verify_token(auth_header).await {
             Ok(claims) => {
-                let db = match Database::new().await {
-                    Ok(db) => db,
-                    Err(e) => {
-                        let http_res = error_response!(500, e.to_string()).map_into_boxed_body();
-                        let (req, _pl) = req.into_parts();
-                        let service_res = ServiceResponse::new(req, http_res);
-                        return Ok(service_res)
-                    }
-                };
-
-                match db.create_table().await {
-                    Ok(()) => (),
-                    Err(e) => {
-                        let http_res = error_response!(500, e.to_string()).map_into_boxed_body();
-                        let (req, _pl) = req.into_parts();
-                        let service_res = ServiceResponse::new(req, http_res);
-                        return Ok(service_res)
-                    }
-                }
-
+                println!("claims: {:?}", claims);
                 let uid: i64 = match claims.user_id.parse() {
                     Ok(uid) => uid,
                     Err(e) => {
@@ -57,29 +38,60 @@ where
                     }
                 };
 
-                if let Some(user) = match db.read_by_uid(uid).await {
-                    Ok(user) => user,
-                    Err(e) => {
-                        let http_res = error_response!(500, e.to_string()).map_into_boxed_body();
+                let cache = &*USER_CACHE;
+                if let Some(user_details) = cache.get(&uid) { // check the cache before calling the db
+                    if !user_details.email_verified {
+                        let http_res = error_response!(403, "Verify your email before using the API service.").map_into_boxed_body();
                         let (req, _pl) = req.into_parts();
                         let service_res = ServiceResponse::new(req, http_res);
-                        return Ok(service_res)
-                    }
-                } {
-                    if !user.email_verified {
-                        let http_res = error_response!(403, "verify your email before using the api service.").map_into_boxed_body();
-                        let (req, _pl) = req.into_parts();
-                        let service_res = ServiceResponse::new(req, http_res);
-                        return Ok(service_res)
+                        return Ok(service_res);
                     }
                 } else {
-                    let http_res = error_response!(404, "no user id found associated with this token").map_into_boxed_body();
-                    let (req, _pl) = req.into_parts();
-                    let service_res = ServiceResponse::new(req, http_res);
-                    return Ok(service_res)
-                };
+                    let db = match Database::new().await {
+                        Ok(db) => db,
+                        Err(e) => {
+                            let http_res = error_response!(500, e.to_string()).map_into_boxed_body();
+                            let (req, _pl) = req.into_parts();
+                            let service_res = ServiceResponse::new(req, http_res);
+                            return Ok(service_res);
+                        }
+                    };
 
-                // implement a cache manager soon for faster api access.
+                    match db.create_table().await {
+                        Ok(()) => (),
+                        Err(e) => {
+                            let http_res = error_response!(500, e.to_string()).map_into_boxed_body();
+                            let (req, _pl) = req.into_parts();
+                            let service_res = ServiceResponse::new(req, http_res);
+                            return Ok(service_res);
+                        }
+                    }
+
+                    let user_details = match db.read_by_uid(uid).await {
+                        Ok(Some(details)) => details,
+                        Ok(None) => {
+                            let http_res = error_response!(404, "No user ID found associated with this token").map_into_boxed_body();
+                            let (req, _pl) = req.into_parts();
+                            let service_res = ServiceResponse::new(req, http_res);
+                            return Ok(service_res);
+                        }
+                        Err(e) => {
+                            let http_res = error_response!(500, e.to_string()).map_into_boxed_body();
+                            let (req, _pl) = req.into_parts();
+                            let service_res = ServiceResponse::new(req, http_res);
+                            return Ok(service_res);
+                        }
+                    };
+
+                    cache.insert(uid, user_details.clone());
+                    if !user_details.email_verified {
+                        let http_res = error_response!(403, "Verify your email before using the API service.").map_into_boxed_body();
+                        let (req, _pl) = req.into_parts();
+                        let service_res = ServiceResponse::new(req, http_res);
+                        return Ok(service_res);
+                    }
+                }
+
             },
             Err(e) => {
                 println!("{:?}", e);

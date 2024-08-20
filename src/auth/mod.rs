@@ -12,6 +12,7 @@ pub mod password_reset;
 pub mod auth_middleware;
 mod utils;
 
+use crate::cache::init_caches::USER_CACHE;
 use crate::{db::auth::auth::Database, error::ActixError, secrets::SECRETS};
 
 use crate::error_response;
@@ -324,6 +325,11 @@ pub async fn verify_email(req_body: String) -> Result<HttpResponse, ActixError> 
 
                 auth_user_db.update_email_verification(user.uid, true).await
                     .map_err(|e| ActixError::DatabaseError(e.to_string()))?;
+
+                
+                let cache = &*USER_CACHE;
+
+                let _ = cache.remove(&user.uid);
 
                 let generate_token = generate_token(user.uid).await;
 

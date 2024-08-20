@@ -5,7 +5,7 @@ use lettre::{message::SinglePart, transport::smtp::authentication::Credentials, 
 use serde::Deserialize;
 use serde_json::json;
 
-use crate::{auth::utils::{validate_password, CodeStorage, TokenHandler}, db::auth::auth::Database, error::ActixError, secrets::SECRETS};
+use crate::{auth::utils::{validate_password, CodeStorage, TokenHandler}, cache::init_caches::USER_CACHE, db::auth::auth::Database, error::ActixError, secrets::SECRETS};
 
 
 
@@ -121,6 +121,10 @@ pub async fn reset_password(req_body: String) -> Result<HttpResponse, ActixError
                     .map_err(|e| ActixError::DatabaseError(e.to_string()))?;
 
                 code_storage.delete_code(&user.uid.to_string());
+
+                let cache = &*USER_CACHE;
+
+                let _ = cache.remove(&user.uid);
 
                 TokenHandler::new().await.destroy_all_tokens(user.uid).await.unwrap();
 

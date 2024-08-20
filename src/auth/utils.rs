@@ -114,7 +114,7 @@ impl CodeStorage {
 }
 
 pub fn validate_password(password: &str) -> Result<(), String> {
-    let password_regex = Regex::new(r"^[a-zA-Z0-9!@#$%^&*()\-_=+?]{8,}$").unwrap();
+    let password_regex = Regex::new(r"^[a-zA-Z0-9!@#$%^&*()\-_=+?]{8,}$").unwrap(); // introduce more rules for a more secure password requirement
 
     if !password_regex.is_match(password) {
         return Err(String::from("Password does not meet the requirements. Password requirements: a-z, A-Z, 0-9 | minimum length: 8 | allowed special characters: !@#$%^&*()-_=+?"))
