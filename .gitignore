@@ -1,0 +1,4 @@
+/target
+/static
+Cargo.lock
+Secrets.toml
