@@ -95,7 +95,6 @@ impl Database {
                 Ok(())
             }
             Err(e) => {
-                    // Rollback the transaction in case of an error
                 txn.rollback().await?;
                 println!("Failed to delete rows with uid = {}: {}", user_id, e);
                 Err(e.into())
