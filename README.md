@@ -13,7 +13,7 @@ This is the backend of acid4sigmas.systems!
 ## Secret.toml
 
 a Secret.toml should look like this
-
+```toml
 SECRET_KEY="your_secret_key_for_jsonwebtoken"
 DB_NAME="your_postgre_db_name"
 DB_PW="your_db_password"
@@ -24,7 +24,7 @@ NO_REPLY_EMAIL="your-no-reply-email@yourservicedomain.com"
 SMTP_USERNAME="your_smtp_username"
 SMTP_PASSWORD="your_smtp_password"
 SMTP_RELAY="your_smtp_password"
-
+```
 
 ### Secret_key
 the secret_key is used to create a jsonwebtoken which will be returned to the user if they create a new account | login into their existing account
