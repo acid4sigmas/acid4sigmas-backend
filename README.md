@@ -5,7 +5,7 @@ This is the backend of acid4sigmas.systems!
 
 ## prerequisites
 - [rust language](https://www.rust-lang.org/tools/install)
-- [postgre sql])(https://www.postgresql.org/)
+- [postgre sql](https://www.postgresql.org/)
 - a domain (you can buy one [here](https://www.namecheap.com/)
 - have your domain set up probably so that it is reachable to the internet
 - an brevo account or any other smtp provider 
