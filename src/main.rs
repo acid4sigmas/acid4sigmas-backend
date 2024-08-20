@@ -6,6 +6,7 @@ mod auth;
 mod db;
 mod secrets;
 mod error;
+mod cache;
 
 use auth::{auth_middleware::check_auth_mw, login, password_reset::{request_reset_password, reset_password}, register, send_verifiaction_email, verify_email};
 
