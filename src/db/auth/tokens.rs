@@ -2,7 +2,7 @@
 
 use chrono::DateTime;
 use chrono::Utc;
-use serde::Deserialize;
+
 use sqlx::postgres::PgRow;
 use sqlx::Row;
 use sqlx::PgPool;
@@ -16,9 +16,9 @@ pub struct Database {
 
 #[derive(Debug)]
 pub struct AuthTokens {
-    pub uid: i64,
+    pub _uid: i64,
     pub jti: String,
-    pub expires_at: DateTime<Utc>
+    pub _expires_at: DateTime<Utc>
 }
 
 impl Database {
@@ -108,7 +108,7 @@ impl Database {
 fn parse_auth_tokens(row: PgRow) -> Result<AuthTokens> {
     Ok(AuthTokens {
         jti: row.try_get(0)?,
-        uid: row.try_get(1)?,
-        expires_at: row.try_get(2)?
+        _uid: row.try_get(1)?,
+        _expires_at: row.try_get(2)?
     })
 }

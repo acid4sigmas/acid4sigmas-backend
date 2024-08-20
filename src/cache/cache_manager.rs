@@ -28,7 +28,7 @@ where
         self.cache.lock().unwrap().insert(key, value);
     }
 
-    pub fn replace(&self, key: K, value: V) {
+    pub fn _replace(&self, key: K, value: V) {
         let mut cache = self.cache.lock().unwrap();
         cache.remove(&key);
         cache.insert(key, value); 
@@ -38,7 +38,7 @@ where
         self.cache.lock().unwrap().remove(key)
     }
 
-    pub fn clear(&self) {
+    pub fn _clear(&self) {
         self.cache.lock().unwrap().clear();
     }
 }
