@@ -114,12 +114,32 @@ impl CodeStorage {
 }
 
 pub fn validate_password(password: &str) -> Result<(), String> {
-    let password_regex = Regex::new(r"^[a-zA-Z0-9!@#$%^&*()\-_=+?]{8,}$").unwrap(); // introduce more rules for a more secure password requirement
+    let min_length = 8;
+    let digit_regex = Regex::new(r"\d").unwrap();
+    let uppercase_regex = Regex::new(r"[A-Z]").unwrap(); 
+    let lowercase_regex = Regex::new(r"[a-z]").unwrap(); 
+    let special_char_regex = Regex::new(r"[!@#$%^&*()\-=+?]").unwrap(); 
 
-    if !password_regex.is_match(password) {
-        return Err(String::from("Password does not meet the requirements. Password requirements: a-z, A-Z, 0-9 | minimum length: 8 | allowed special characters: !@#$%^&*()-_=+?"))
+    if password.len() < min_length {
+        return Err(format!("password must be at least {} chars long", min_length));
     }
 
+    if !digit_regex.is_match(password) {
+        return Err(String::from("password must contain at least one digit."));
+    }
+
+    if !uppercase_regex.is_match(password) {
+        return Err(String::from("password must contain at least one uppercase letter."));
+    }
+
+    if !lowercase_regex.is_match(password) {
+        return Err(String::from("password must contain at least one lowercase letter."));
+    }
+
+    if !special_char_regex.is_match(password) {
+        return Err(String::from("password must contain at least one special character. allowed special characters: !@#$%^&*()-_=+?"));
+    }
+    
     Ok(())
 }
 
