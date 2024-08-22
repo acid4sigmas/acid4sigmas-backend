@@ -3,17 +3,20 @@ use actix_web::{post, HttpResponse, Result};
 use bcrypt::{hash, verify, DEFAULT_COST};
 use jsonwebtoken::{decode, encode, Algorithm, DecodingKey, EncodingKey, Header, Validation};
 use lettre::{message::SinglePart, transport::smtp::authentication::Credentials, Message, SmtpTransport, Transport};
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use serde_json::json;
-use utils::{generate_uid, validate_password, CodeStorage, TokenHandler, UsernameOrEmail};
+use utils::{generate_uid, validate_password, Claims, CodeStorage, TokenHandler, UsernameOrEmail};
 use uuid::Uuid;
 
 pub mod password_reset;
 pub mod auth_middleware;
-mod utils;
+pub mod utils;
 
 use crate::cache::init_caches::USER_CACHE;
 use crate::{db::auth::auth::Database, error::ActixError, secrets::SECRETS};
+
+use crate::db::api::me::Database as UserDatabase;
+
 
 use crate::error_response;
 
@@ -21,12 +24,6 @@ fn get_secret_key() -> Vec<u8> {
     SECRETS.get("SECRET_KEY").unwrap().as_bytes().to_vec()
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-struct Claims {
-    user_id: String,
-    exp: usize, 
-    jti: String
-}
 
 async fn generate_token(user_id: i64) -> String {
 
@@ -137,6 +134,21 @@ pub async fn register(req_body: String) -> HttpResponse {
         let uid = generate_uid();
 
         match auth_user_db.insert(uid, &json_content.username, &hashed, &json_content.email).await {
+            Ok(()) => (),
+            Err(e) => return error_response!(500, e.to_string())
+        }
+
+        let user_db = match UserDatabase::new().await {
+            Ok(db) => db,
+            Err(e) => return error_response!(500, e.to_string())
+        };
+
+        match user_db.create_table().await {
+            Ok(()) => (),
+            Err(e) => return error_response!(500, e.to_string())
+        }
+
+        match user_db.insert(uid, &json_content.username, &json_content.email).await {
             Ok(()) => (),
             Err(e) => return error_response!(500, e.to_string())
         }

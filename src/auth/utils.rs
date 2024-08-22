@@ -161,7 +161,7 @@ impl UsernameOrEmail {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Claims {
     pub user_id: String,
     pub exp: usize, 

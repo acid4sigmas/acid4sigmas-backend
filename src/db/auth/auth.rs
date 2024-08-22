@@ -11,7 +11,7 @@ pub struct Database {
 } 
 
 #[derive(Debug, Clone)]
-pub struct User {
+pub struct AuthUser {
     pub uid: i64,
     pub email: String,
     pub email_verified: bool,
@@ -67,7 +67,7 @@ impl Database {
         Ok(())
     }
 
-    pub async fn read_by_username(&self, username: &str) -> Result<Option<User>> {
+    pub async fn read_by_username(&self, username: &str) -> Result<Option<AuthUser>> {
         let row = sqlx::query("SELECT * FROM auth_users WHERE username = $1")
             .bind(username)
             .fetch_optional(&self.pool)
@@ -81,7 +81,7 @@ impl Database {
         Ok(user)
     }
 
-    pub async fn read_by_uid(&self, uid: i64) -> Result<Option<User>> {
+    pub async fn read_by_uid(&self, uid: i64) -> Result<Option<AuthUser>> {
         let row = sqlx::query("SELECT * FROM auth_users WHERE uid = $1")
             .bind(uid)
             .fetch_optional(&self.pool)
@@ -95,7 +95,7 @@ impl Database {
         Ok(user)
     }
 
-    pub async fn read_by_email(&self, email: &str) -> Result<Option<User>> {
+    pub async fn read_by_email(&self, email: &str) -> Result<Option<AuthUser>> {
         let row = sqlx::query("SELECT * FROM auth_users WHERE email = $1")
             .bind(email)
             .fetch_optional(&self.pool)
@@ -139,8 +139,8 @@ impl Database {
     }
 }
 
-fn parse_auth_user_record(row: PgRow) -> Result<User> {
-    Ok(User {
+fn parse_auth_user_record(row: PgRow) -> Result<AuthUser> {
+    Ok(AuthUser {
         uid: row.try_get(0)?,
         email: row.try_get(1)?,
         email_verified: row.try_get(2)?,

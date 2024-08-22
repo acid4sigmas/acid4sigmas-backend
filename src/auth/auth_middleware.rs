@@ -1,8 +1,5 @@
 use actix_web::{
-    body::{BoxBody, MessageBody},
-    dev::{ServiceRequest, ServiceResponse},
-    http::header::AUTHORIZATION,
-    Error, HttpResponse,
+    body::{BoxBody, MessageBody}, dev::{ServiceRequest, ServiceResponse}, http::header::AUTHORIZATION, Error, HttpMessage, HttpResponse
 };
 use actix_web_lab::middleware::Next;
 use serde_json::json;
@@ -90,6 +87,8 @@ where
                         return Ok(service_res);
                     }
                 }
+
+                req.extensions_mut().insert(claims);
 
             },
             Err(e) => {
