@@ -9,14 +9,15 @@ mod db;
 mod secrets;
 mod error;
 mod cache;
+mod api;
 
 use auth::{auth_middleware::check_auth_mw, login, password_reset::{request_reset_password, reset_password}, register, send_verifiaction_email, verify_email};
-
+use api::me::me;
 
 use actix_files as fs; 
 
 use actix_web_lab::middleware::from_fn;
-
+use actix_cors::Cors;
 
 #[macro_export]
 macro_rules! error_response {
@@ -37,13 +38,22 @@ async fn nested_hello() -> impl Responder {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+
+
     HttpServer::new(|| {
+        let cors = Cors::default()
+        .allow_any_header()
+        .allow_any_origin()
+        .allow_any_method();
+    
         App::new()
+            .wrap(cors)
             .service(fs::Files::new("/static", "static").show_files_listing())
             .service(
                 web::scope("/api")
                     .wrap(from_fn(check_auth_mw))
                     .route("/nested", web::get().to(nested_hello))
+                    .service(me)
             )   
             .service(
                 web::scope("/auth")
