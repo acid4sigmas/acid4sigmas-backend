@@ -12,7 +12,7 @@ mod cache;
 mod api;
 
 use auth::{auth_middleware::check_auth_mw, login, password_reset::{request_reset_password, reset_password}, register, send_verifiaction_email, verify_email};
-use api::me::me;
+use api::{cloudthemes::{get_cloudthemes, set_cloudtheme}, me::me};
 
 use actix_files as fs; 
 
@@ -23,7 +23,7 @@ use actix_cors::Cors;
 macro_rules! error_response {
     ($status_code:expr, $message:expr) => {
         HttpResponse::build(actix_web::http::StatusCode::from_u16($status_code).unwrap())
-            .json(json!({ "error": $message }))
+            .json(serde_json::json!({ "error": $message }))
     };
 }
 
@@ -54,6 +54,8 @@ async fn main() -> std::io::Result<()> {
                     .wrap(from_fn(check_auth_mw))
                     .route("/nested", web::get().to(nested_hello))
                     .service(me)
+                    .service(set_cloudtheme)
+                    .service(get_cloudthemes)
             )   
             .service(
                 web::scope("/auth")
