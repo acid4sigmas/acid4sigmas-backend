@@ -1,5 +1,4 @@
 use actix_web::{get, HttpMessage, HttpRequest, HttpResponse};
-use serde_json::json;
 use crate::{auth::utils::Claims, cache::init_caches::USER_ME_CACHE, db::api::me::Database, error_response};
 
 #[get("/me")]
