@@ -8,7 +8,7 @@ pub async fn me(req: HttpRequest) -> HttpResponse {
 
     let user_id = match claims.user_id.parse::<i64>() {
         Ok(uid) => uid,
-        Err(e) => error_response!(500, e.to_string())
+        Err(e) => return error_response!(500, e.to_string())
     };
 
     let cache = &*USER_ME_CACHE;
