@@ -10,6 +10,7 @@ mod secrets;
 mod error;
 mod cache;
 mod api;
+mod pub_api;
 
 use auth::{auth_middleware::check_auth_mw, login, password_reset::{request_reset_password, reset_password}, register, send_verifiaction_email, verify_email};
 use api::{cloudthemes::{get_cloudthemes, set_cloudtheme}, me::me};
@@ -18,6 +19,7 @@ use actix_files as fs;
 
 use actix_web_lab::middleware::from_fn;
 use actix_cors::Cors;
+use pub_api::github::get_repo_;
 
 #[macro_export]
 macro_rules! error_response {
@@ -57,6 +59,10 @@ async fn main() -> std::io::Result<()> {
                     .service(set_cloudtheme)
                     .service(get_cloudthemes)
             )   
+            .service(
+                web::scope("/pub_api")
+                    .service(get_repo_)
+            )
             .service(
                 web::scope("/auth")
                     .service(register)

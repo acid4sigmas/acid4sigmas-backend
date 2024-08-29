@@ -13,6 +13,8 @@ lazy_static::lazy_static! {
         secrets.insert("SMTP_USERNAME".to_string(), data["SMTP_USERNAME"].as_str().unwrap().to_string());
         secrets.insert("SMTP_PASSWORD".to_string(), data["SMTP_PASSWORD"].as_str().unwrap().to_string());
         secrets.insert("SMTP_RELAY".to_string(), data["SMTP_RELAY"].as_str().unwrap().to_string());
+        secrets.insert("REPO".to_string(), data["REPO"].as_str().unwrap().to_string());
+        secrets.insert("OWNER".to_string(), data["OWNER"].as_str().unwrap().to_string());
         secrets
     };
 }
