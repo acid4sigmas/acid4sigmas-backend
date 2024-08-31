@@ -9,8 +9,8 @@ use crate::secrets::SECRETS;
 pub struct User {
     pub uid: i64,
     pub email: String,
-    pub email_verified: String,
     pub owner: bool,
+    pub email_verified: bool,
     pub username: String
 }
 
@@ -62,6 +62,8 @@ impl Database {
         .execute(&mut *txn)
         .await?;
 
+        txn.commit().await?;
+
         Ok(())
     }
 
@@ -89,6 +91,6 @@ fn parse_auth_user_record(row: PgRow) -> Result<User> {
         email: row.try_get(1)?,
         owner: row.try_get(2)?,
         email_verified: row.try_get(3)?,
-        username: row.try_get(4)?,
+        username: row.try_get(4)?
     })
 }

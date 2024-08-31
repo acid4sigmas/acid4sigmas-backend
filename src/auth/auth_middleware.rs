@@ -17,6 +17,8 @@ pub async fn check_auth_mw<B>(
 where
     B: MessageBody + 'static,
 {
+    let path = req.path().to_string();
+
     if let Some(auth_header) = req.headers().get(AUTHORIZATION) {
         let auth_header = auth_header.to_str().unwrap();
 
@@ -36,7 +38,7 @@ where
 
                 let cache = &*USER_CACHE;
                 if let Some(user_details) = cache.get(&uid) { // check the cache before calling the db
-                    if !user_details.email_verified {
+                    if !user_details.email_verified && path != "/api/me" {
                         let http_res = error_response!(403, "Verify your email before using the API service.").map_into_boxed_body();
                         let (req, _pl) = req.into_parts();
                         let service_res = ServiceResponse::new(req, http_res);

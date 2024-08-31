@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use serde::Deserialize;
+
 use anyhow::Result;
 
 use super::RepoInfo;
@@ -40,10 +40,7 @@ pub async fn get_repo_info(owner: &str, repo: &str) -> Result<RepoInfo> {
 
 }
 
-#[derive(Deserialize, Debug)]
-struct Languages {
-    languages: HashMap<String, u64>,
-}
+
 
 async fn get_repo_language(owner: &str, repo: &str) -> Result<Option<HashMap<String, u64>>> {
     let url = format!(

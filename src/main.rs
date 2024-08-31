@@ -1,6 +1,6 @@
 #![allow(deprecated)]
 
-use actix_web::{get,  web, App, HttpResponse, HttpServer, Responder};
+use actix_web::{get, web, App, HttpResponse, HttpServer, Responder};
 
 
 
@@ -29,8 +29,25 @@ macro_rules! error_response {
     };
 }
 
+#[macro_export]
+macro_rules! message_response {
+    ($message:expr) => {
+        HttpResponse::build(actix_web::http::StatusCode::OK)
+            .json(serde_json::json!({"message": $message}))
+    }
+}
+
+#[macro_export]
+macro_rules! token_response {
+    ($token:expr) => {
+        HttpResponse::build(actix_web::http::StatusCode::OK)
+            .json(serde_json::json!({"token": $token}))
+    }
+}
+
 #[get("/")]
 async fn index() -> impl Responder {
+ 
     HttpResponse::Ok().content_type("text/html").body(include_str!("../static/index.html"))
 }
 
