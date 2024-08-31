@@ -9,6 +9,8 @@ use crate::secrets::SECRETS;
 pub struct User {
     pub uid: i64,
     pub email: String,
+    pub email_verified: String,
+    pub owner: bool,
     pub username: String
 }
 
@@ -34,6 +36,8 @@ impl Database {
             "CREATE TABLE IF NOT EXISTS users (
                 uid BIGINT PRIMARY KEY,
                 email TEXT,
+                owner BOOLEAN DEFAULT FALSE,
+                email_verified BOOLEAN DEFAULT FALSE,
                 username TEXT
             )"
         )
@@ -62,7 +66,7 @@ impl Database {
     }
 
     pub async fn read_by_uid(&self, uid: i64) -> Result<Option<User>> {
-        let row = sqlx::query("SELECT * FROM auth_users WHERE uid = $1")
+        let row = sqlx::query("SELECT * FROM users WHERE uid = $1")
             .bind(uid)
             .fetch_optional(&self.pool)
             .await?;
@@ -83,6 +87,8 @@ fn parse_auth_user_record(row: PgRow) -> Result<User> {
     Ok(User {
         uid: row.try_get(0)?,
         email: row.try_get(1)?,
-        username: row.try_get(3)?,
+        owner: row.try_get(2)?,
+        email_verified: row.try_get(3)?,
+        username: row.try_get(4)?,
     })
 }
