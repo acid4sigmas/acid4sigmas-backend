@@ -9,7 +9,7 @@ pub mod password_reset;
 pub mod auth_middleware;
 pub mod utils;
 
-use crate::cache::init_caches::USER_CACHE;
+use crate::cache::init_caches::{USER_CACHE, USER_ME_CACHE};
 use crate::{db::auth::auth::Database, secrets::SECRETS};
 
 use crate::db::api::me::Database as UserDatabase;
@@ -206,6 +206,12 @@ pub async fn send_verifiaction_email(req_body: String) -> HttpResponse {
     match auth_user {
         Some(user) => {
             if user.email_verified {
+                let cache = &*USER_CACHE;
+
+                let result = cache.remove(&user.uid);
+
+                println!("result: {:?}", result);
+
                 return error_response!(409, "your email is already verified");
             } else {
 
@@ -311,10 +317,15 @@ pub async fn verify_email(req_body: String) -> HttpResponse {
                     Ok(()) => (),
                     Err(e) => return error_response!(500, e.to_string())
                 }
-                    
+
+                                    
                 let cache = &*USER_CACHE;
 
                 let _ = cache.remove(&user.uid);
+
+                let cache_api = &*USER_ME_CACHE;
+
+                let _ = cache_api.remove(&user.uid);
 
                 let generated_token = match TokenHandler::new().await.generate_token(user.uid).await {
                     Ok(token) => token,

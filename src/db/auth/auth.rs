@@ -4,6 +4,7 @@ use sqlx::Row;
 use sqlx::PgPool;
 use anyhow::Result;
 
+
 use crate::secrets::SECRETS;
 
 pub struct Database {
@@ -110,10 +111,17 @@ impl Database {
     }
 
     pub async fn update_email_verification(&self, uid: i64, email_verification: bool) -> Result<()> {
-
         let mut txn = self.pool.begin().await?;
 
         sqlx::query("UPDATE auth_users SET email_verified = $1 WHERE uid = $2")
+            .bind(email_verification)
+            .bind(uid)
+            .execute(&mut *txn)
+            .await?;
+
+        // also update the users db 
+
+        sqlx::query("UPDATE users SET email_verified = $1 WHERE uid = $2")
             .bind(email_verification)
             .bind(uid)
             .execute(&mut *txn)
