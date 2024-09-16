@@ -1,6 +1,6 @@
 use actix_web::{get, post, web, HttpMessage, HttpRequest, HttpResponse};
 
-use crate::{auth::utils::Claims, cache::init_caches::USER_CLOUDTHEMES, db::api::cloudthemes::{Database, Theme}, error_response};
+use crate::{auth::utils::Claims, cache::init_caches::USER_CLOUDTHEMES, db::api::cloudthemes::cloudthemes::{Database, Theme}, error_response};
 
 #[post("/cloudthemes")]
 pub async fn set_cloudtheme(req: HttpRequest, body: web::Bytes) -> HttpResponse {
@@ -10,8 +10,6 @@ pub async fn set_cloudtheme(req: HttpRequest, body: web::Bytes) -> HttpResponse 
         Ok(uid) => uid,
         Err(e) => return error_response!(500, e.to_string())
     };
-
-
 
     let body_str = match String::from_utf8(body.to_vec()) {
         Ok(body) => body,
@@ -76,7 +74,7 @@ pub async fn get_cloudthemes(req: HttpRequest) -> HttpResponse {
             
             return HttpResponse::Ok().json(theme)
         } else {
-            return error_response!(404, "no theme found for this uid ");
+            return error_response!(404, "no theme found for this uid");
         }
         
     }

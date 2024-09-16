@@ -1,4 +1,4 @@
-use anyhow::Ok;
+
 use sqlx::postgres::PgRow;
 use sqlx::Row;
 use sqlx::PgPool;

@@ -13,7 +13,7 @@ mod api;
 mod pub_api;
 
 use auth::{auth_middleware::check_auth_mw, login, password_reset::{request_reset_password, reset_password}, register, send_verifiaction_email, verify_email};
-use api::{cloudthemes::{get_cloudthemes, set_cloudtheme}, me::me};
+use api::{cloudthemes::{status::{get_cloudthemes_status, post_cloudthemes_status}, cloudthemes::{get_cloudthemes, set_cloudtheme}}, me::me};
 
 use actix_files as fs; 
 
@@ -75,6 +75,8 @@ async fn main() -> std::io::Result<()> {
                     .service(me)
                     .service(set_cloudtheme)
                     .service(get_cloudthemes)
+                    .service(get_cloudthemes_status)
+                    .service(post_cloudthemes_status)
             )   
             .service(
                 web::scope("/pub_api")
