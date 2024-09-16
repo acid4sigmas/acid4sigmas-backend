@@ -78,5 +78,5 @@ pub async fn post_cloudthemes_status(req: HttpRequest, body: web::Bytes) -> Http
         Err(e) => return error_response!(500, e.to_string())
     }
 
-    HttpResponse::Ok().finish()
+    HttpResponse::Ok().json(status)
 }
