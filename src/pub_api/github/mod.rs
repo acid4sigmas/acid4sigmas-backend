@@ -56,15 +56,12 @@ pub async fn get_repo_() -> HttpResponse {
 
         cache.insert(0, repo.clone());
 
-        println!("got repo from expired timestamp lol: {:?}", repo);
-
         return HttpResponse::Ok().json(repo)
 
 
     } else {
         drop(cached_timestamp);
         if let Some(cache) = cache.get(&0) {
-            println!("got repo from cache: {:?}", cache);
             return HttpResponse::Ok().json(cache)
         } else {
             let repo = match get_repo_info(SECRETS.get("OWNER").unwrap(), SECRETS.get("REPO").unwrap()).await {

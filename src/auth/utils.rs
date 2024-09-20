@@ -143,6 +143,22 @@ pub fn validate_password(password: &str) -> Result<(), String> {
     Ok(())
 }
 
+pub fn validate_username(username: &str) -> Result<(), String> {
+    let min_length = 3;
+    let max_length = 32;
+    let username_regex = Regex::new(r"[a-zA-Z0-9-_]+$").unwrap();
+
+    if username.len() > max_length {
+        return Err(String::from("username is too long."))
+    } else if username.len() < min_length {
+        return Err(String::from("usernane is too short"))
+    } else if !username_regex.is_match(username) {
+        return Err(String::from("only the following characters are allowed: a-z, A-Z, 0-9, _-"))
+    };
+
+    Ok(())
+}
+
 #[derive(Debug)]
 pub enum UsernameOrEmail {
     Email(String),

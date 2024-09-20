@@ -3,7 +3,7 @@ use actix_web::{post, HttpResponse};
 use bcrypt::{hash, verify, DEFAULT_COST};
 use lettre::{message::SinglePart, transport::smtp::authentication::Credentials, Message, SmtpTransport, Transport};
 use serde::Deserialize;
-use utils::{generate_uid, validate_password, CodeStorage, TokenHandler, UsernameOrEmail};
+use utils::{generate_uid, validate_password, validate_username, CodeStorage, TokenHandler, UsernameOrEmail};
 
 pub mod password_reset;
 pub mod auth_middleware;
@@ -62,6 +62,11 @@ pub async fn register(req_body: String) -> HttpResponse {
 
 
     match validate_password(&json_content.password) {
+        Ok(()) => (),
+        Err(e) => return error_response!(403, e.to_string())
+    }
+
+    match validate_username(&json_content.username) {
         Ok(()) => (),
         Err(e) => return error_response!(403, e.to_string())
     }
@@ -210,8 +215,6 @@ pub async fn send_verifiaction_email(req_body: String) -> HttpResponse {
 
                 let result = cache.remove(&user.uid);
 
-                println!("result: {:?}", result);
-
                 return error_response!(409, "your email is already verified");
             } else {
 
@@ -239,9 +242,6 @@ pub async fn send_verifiaction_email(req_body: String) -> HttpResponse {
 const EMAIL_VERIFY_BODY: &str = include_str!("verify_email_body.html");
 
 fn send_email(code: &str, email: &str) -> anyhow::Result<()> {
-
-    println!("{}", email);
-
     let body = EMAIL_VERIFY_BODY.replace("{code}", code);
 
     let email = Message::builder()
