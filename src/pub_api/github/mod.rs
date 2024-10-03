@@ -12,20 +12,23 @@ mod get_repo;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Repo {
+    pub name: String,
     pub forks: u32,
     pub language: Option<String>,
     pub owner: Owner,
+    pub html_url: String,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct RepoInfo {
     pub languages: Option<HashMap<String, u64>>,
-    pub repo: Repo
+    pub repo: Repo,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Owner {
     pub login: String,
+    pub html_url: String,
 }
 
 type SharedTimestamp = Arc<Mutex<DateTime<Utc>>>;
@@ -44,38 +47,51 @@ pub async fn get_repo_() -> HttpResponse {
 
     let cache = &*GITHUB_REPO_CACHE;
 
+    let repos: Vec<String> = SECRETS
+        .get("REPO")
+        .unwrap()
+        .split(',')
+        .map(|s| s.trim().to_string())
+        .collect();
+
     if now > *cached_timestamp {
         *cached_timestamp = now + Duration::minutes(10);
 
         drop(cached_timestamp);
 
-        let repo = match get_repo_info(SECRETS.get("OWNER").unwrap(), SECRETS.get("REPO").unwrap()).await {
-            Ok(repo) => repo,
-            Err(e) => return error_response!(500, e.to_string())
-        };
+        let mut repos_vec: Vec<RepoInfo> = Vec::new();
 
-        cache.insert(0, repo.clone());
+        for repo in repos {
+            let repo = match get_repo_info(SECRETS.get("OWNER").unwrap(), &repo).await {
+                Ok(repo) => repo,
+                Err(e) => return error_response!(500, e.to_string()),
+            };
 
-        return HttpResponse::Ok().json(repo)
+            repos_vec.push(repo);
+        }
 
+        cache.insert(0, repos_vec.clone());
 
+        return HttpResponse::Ok().json(repos_vec);
     } else {
         drop(cached_timestamp);
         if let Some(cache) = cache.get(&0) {
-            return HttpResponse::Ok().json(cache)
+            return HttpResponse::Ok().json(cache);
         } else {
-            let repo = match get_repo_info(SECRETS.get("OWNER").unwrap(), SECRETS.get("REPO").unwrap()).await {
-                Ok(repo) => repo,
-                Err(e) => return error_response!(500, e.to_string())
-            };
-    
-            cache.insert(0, repo.clone());
+            let mut repos_vec: Vec<RepoInfo> = Vec::new();
 
-            println!("got repo from nothing in cache: {:?}", repo);
+            for repo in repos {
+                let repo = match get_repo_info(SECRETS.get("OWNER").unwrap(), &repo).await {
+                    Ok(repo) => repo,
+                    Err(e) => return error_response!(500, e.to_string()),
+                };
 
-            return HttpResponse::Ok().json(repo)
+                repos_vec.push(repo);
+            }
+
+            cache.insert(0, repos_vec.clone());
+
+            return HttpResponse::Ok().json(repos_vec);
         }
     }
-
-    
 }

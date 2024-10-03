@@ -13,7 +13,14 @@ lazy_static::lazy_static! {
         secrets.insert("SMTP_USERNAME".to_string(), data["SMTP_USERNAME"].as_str().unwrap().to_string());
         secrets.insert("SMTP_PASSWORD".to_string(), data["SMTP_PASSWORD"].as_str().unwrap().to_string());
         secrets.insert("SMTP_RELAY".to_string(), data["SMTP_RELAY"].as_str().unwrap().to_string());
-        secrets.insert("REPO".to_string(), data["REPO"].as_str().unwrap().to_string());
+        if let Some(repo_array) = data["REPO"].as_array() {
+            let repos = repo_array
+                .iter()
+                .map(|val| val.as_str().unwrap().to_string())
+                .collect::<Vec<String>>()
+                .join(",");
+            secrets.insert("REPO".to_string(), repos);
+        }
         secrets.insert("OWNER".to_string(), data["OWNER"].as_str().unwrap().to_string());
         secrets
     };

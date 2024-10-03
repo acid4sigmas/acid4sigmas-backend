@@ -1,4 +1,13 @@
-use crate::{db::{api::{cloudthemes::{cloudthemes::CloudTheme, status::CloudThemesStatus}, me::User}, auth::auth::AuthUser}, pub_api::github::RepoInfo};
+use crate::{
+    db::{
+        api::{
+            cloudthemes::{cloudthemes::CloudTheme, status::CloudThemesStatus},
+            me::User,
+        },
+        auth::auth::AuthUser,
+    },
+    pub_api::github::RepoInfo,
+};
 
 use super::cache_manager::CacheManager;
 
@@ -17,10 +26,10 @@ lazy_static! {
 }
 
 lazy_static! {
-    pub static ref USER_CLOUDTHEMES_STATUS: CacheManager<i64, CloudThemesStatus> = CacheManager::new(600);
+    pub static ref USER_CLOUDTHEMES_STATUS: CacheManager<i64, CloudThemesStatus> =
+        CacheManager::new(600);
 }
 
 lazy_static! {
-    pub static ref GITHUB_REPO_CACHE: CacheManager<i64, RepoInfo> = CacheManager::new(10);
+    pub static ref GITHUB_REPO_CACHE: CacheManager<i64, Vec<RepoInfo>> = CacheManager::new(10);
 }
-
