@@ -1,16 +1,18 @@
-## Before we start
+## Bevor wir Anfangen
 
 In diesem Buch werde ich darüber reden, wie ich zu Christus (Gott) gefunden habe
 und wie Gott mich motiviert hat mein Leben weiterzuführen und mich selbst zu verbessern.
 Hier werden Sie einige Einblicke und Ereignese in meinem privaten Leben kennenlernen.
 Ich erfreue mich sehr daran, dass Sie ihre Zeit investieren um dieses Buch hier zu lesen.
 Das Buch wird in mehrere Kapitel aufgeteilt, jedes wird ein Ereignes/Story representieren.
-Bitte achten Sie darauf dieses Buch im Kontext zu lesen um die Nachricht und Bedeutung dieses Buches zu verstehen.di
+Bitte achten Sie darauf dieses Buch im Kontext zu lesen um die Nachricht und Bedeutung dieses Buches zu verstehen.
+
+Ich hoffe, dass Ihnen dieses Buch gefällt, Gottes segen.
 
 
 
 <div style="text-align: center;">
-  <img src="http://127.0.0.1:8080/assets/faith_book/IMG_0019.png"></img>
+  <img src="http://127.0.0.1:8080/assets/faith_book/mary.png"></img>
 </div>
 
 end is here
