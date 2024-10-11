@@ -11,6 +11,13 @@ use crate::{
 
 use serde::Deserialize;
 
+const FAITH_BOOK_DIR: &str = "./assets/faith_book";
+
+#[get("/faith/book")]
+pub async fn faith_book_index() -> HttpResponse {
+    HttpResponse::Ok().finish()
+}
+
 #[derive(Deserialize)]
 struct QueryParams {
     lang: Option<String>,
@@ -29,7 +36,7 @@ pub async fn faith_book(
         lang = "en"
     }
 
-    let path = PathBuf::from(format!("./assets/faith_book/{}/{}.md", lang, chapter_id));
+    let path = PathBuf::from(format!("{}/{}/{}.md", FAITH_BOOK_DIR, lang, chapter_id));
 
     println!("path: {:?}", path);
 
