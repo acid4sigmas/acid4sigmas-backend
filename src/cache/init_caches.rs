@@ -1,10 +1,8 @@
 use crate::{
-    db::{
-        api::{
-            cloudthemes::{cloudthemes::CloudTheme, status::CloudThemesStatus},
-            me::User,
-        },
-        auth::auth::AuthUser,
+    db::auth::auth::AuthUser,
+    models::api::{
+        cloudtheme::{CloudTheme, CloudThemesStatus},
+        users::User,
     },
     pub_api::github::RepoInfo,
 };

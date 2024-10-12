@@ -7,6 +7,7 @@ mod auth;
 mod cache;
 mod db;
 mod error;
+mod models;
 mod pub_api;
 mod secrets;
 mod util;

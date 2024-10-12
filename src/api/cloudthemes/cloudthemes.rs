@@ -3,8 +3,9 @@ use actix_web::{get, post, web, HttpMessage, HttpRequest, HttpResponse};
 use crate::{
     auth::utils::Claims,
     cache::init_caches::USER_CLOUDTHEMES,
-    db::api::cloudthemes::cloudthemes::{CloudTheme, Database, Theme},
+    db::api::cloudthemes::cloudthemes::{CloudThemeDatabase, CloudThemeDb},
     error_response,
+    models::api::cloudtheme::{CloudTheme, Theme},
 };
 
 #[post("/cloudthemes")]
@@ -28,7 +29,7 @@ pub async fn set_cloudtheme(req: HttpRequest, body: web::Bytes) -> HttpResponse 
 
     println!("theme: {:?}", theme);
 
-    let db = match Database::new().await {
+    let db = match CloudThemeDatabase::new().await {
         Ok(db) => db,
         Err(e) => return error_response!(500, e.to_string()),
     };
@@ -68,7 +69,7 @@ pub async fn get_cloudthemes(req: HttpRequest) -> HttpResponse {
     if let Some(cloudtheme) = cache.get(&user_id) {
         return HttpResponse::Ok().json(cloudtheme);
     } else {
-        let db = match Database::new().await {
+        let db = match CloudThemeDatabase::new().await {
             Ok(db) => db,
             Err(e) => return error_response!(500, e.to_string()),
         };

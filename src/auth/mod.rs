@@ -18,7 +18,7 @@ pub mod utils;
 use crate::cache::init_caches::{USER_CACHE, USER_ME_CACHE};
 use crate::{db::auth::auth::Database, secrets::SECRETS};
 
-use crate::db::api::me::Database as UserDatabase;
+use crate::db::api::users::{UserDatabase, UserDb};
 
 use crate::{error_response, message_response, token_response};
 
